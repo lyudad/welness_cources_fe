@@ -1,39 +1,22 @@
-// ** Next Imports
 import Head from 'next/head'
 import { Router } from 'next/router'
 import type { NextPage } from '../../next'
 import type { AppProps } from 'next/app'
-import { UserProvider } from '@auth0/nextjs-auth0/client'
-
-// ** auth0
-
-// ** Loader Import
 import NProgress from 'nprogress'
-
-// ** Emotion Imports
 import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
-
-// ** Config Imports
 import themeConfig from '../configs/themeConfig'
-
-// ** Component Imports
-import UserLayout from '../layouts/UserLayout'
 import ThemeComponent from '../@core/theme/ThemeComponent'
-
-// ** Contexts
 import { SettingsConsumer, SettingsProvider } from '../@core/context/settingsContext'
-
-// ** Utils Imports
 import { createEmotionCache } from '../@core/utils/create-emotion-cache'
-
-// ** React Perfect Scrollbar Style
 import 'react-perfect-scrollbar/dist/css/styles.css'
-
-// ** Global css styles
 import '../../styles/globals.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastContainer } from 'react-toastify'
 
-// ** Extend App Props with Emotion
+import 'react-toastify/dist/ReactToastify.css'
+import { AuthProvider } from '../layouts/AuthContext'
+
 type ExtendedAppProps = AppProps & {
   Component: NextPage
   emotionCache: EmotionCache
@@ -58,6 +41,8 @@ if (themeConfig.routingLoader) {
 const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
+  const queryClient = new QueryClient()
+
   // Variables
   const getLayout = Component.getLayout ?? (page => page)
 
@@ -72,13 +57,19 @@ const App = (props: ExtendedAppProps) => {
         <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
-      <SettingsProvider>
-        <SettingsConsumer>
-          {({ settings }) => {
-            return <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
-          }}
-        </SettingsConsumer>
-      </SettingsProvider>
+
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <SettingsProvider>
+            <SettingsConsumer>
+              {({ settings }) => {
+                return <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
+              }}
+            </SettingsConsumer>
+          </SettingsProvider>
+          <ToastContainer />
+        </AuthProvider>
+      </QueryClientProvider>
     </CacheProvider>
   )
 }
