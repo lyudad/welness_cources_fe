@@ -18,12 +18,7 @@ const Accordion = (theme: Theme) => {
     MuiAccordionSummary: {
       styleOverrides: {
         root: {
-          padding: `0 ${theme.spacing(5)}`,
-          '& + .MuiCollapse-root': {
-            '& .MuiAccordionDetails-root:first-child': {
-              paddingTop: 0
-            }
-          }
+          padding: `0 ${theme.spacing(5)}`
         },
         content: {
           margin: `${theme.spacing(2.5)} 0`

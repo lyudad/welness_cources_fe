@@ -1,5 +1,6 @@
 // ** React Imports
-import { useState, Fragment, ChangeEvent, MouseEvent, ReactNode } from 'react'
+import { ChangeEvent, Fragment, MouseEvent, useState } from 'react'
+import { useRouter } from 'next/router'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -37,6 +38,9 @@ import BlankLayout from '../../../@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV1 from '../../../views/pages/auth/FooterIllustration'
+import { registerQuery } from '../../../api/auth/registration'
+import { useMutation } from '@tanstack/react-query'
+import { useAuthContext } from '../../../layouts/useAuthContext'
 
 interface State {
   password: string
@@ -64,10 +68,23 @@ const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(({ t
 }))
 
 const RegisterPage = () => {
-  // ** States
+  const router = useRouter()
+
   const [values, setValues] = useState<State>({
     password: '',
     showPassword: false
+  })
+  const [firstName, setFirstName] = useState<string>('')
+  const [lastName, setLastName] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+
+  const { onAuth } = useAuthContext()
+
+  const { mutate } = useMutation(registerQuery, {
+    onSuccess: data => {
+      onAuth(data.data)
+      router.push('/')
+    }
   })
 
   // ** Hook
@@ -81,6 +98,10 @@ const RegisterPage = () => {
   }
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
+  }
+
+  const handleRegisterClick = () => {
+    mutate({ firstName, lastName, password: values.password, email })
   }
 
   return (
@@ -167,8 +188,31 @@ const RegisterPage = () => {
             <Typography variant='body2'>Make your app management easy and fun!</Typography>
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-            <TextField autoFocus fullWidth id='username' label='Username' sx={{ marginBottom: 4 }} />
-            <TextField fullWidth type='email' label='Email' sx={{ marginBottom: 4 }} />
+            <TextField
+              autoFocus
+              fullWidth
+              id='firstName'
+              label='First name'
+              sx={{ marginBottom: 4 }}
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              id='lastName'
+              label='Last name'
+              sx={{ marginBottom: 4 }}
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              type='email'
+              label='Email'
+              sx={{ marginBottom: 4 }}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
             <FormControl fullWidth>
               <InputLabel htmlFor='auth-register-password'>Password</InputLabel>
               <OutlinedInput
@@ -191,20 +235,15 @@ const RegisterPage = () => {
                 }
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox />}
-              label={
-                <Fragment>
-                  <span>I agree to </span>
-                  <Link href='/' passHref>
-                    <LinkStyled onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                      privacy policy & terms
-                    </LinkStyled>
-                  </Link>
-                </Fragment>
-              }
-            />
-            <Button fullWidth size='large' type='submit' variant='contained' sx={{ marginBottom: 7 }}>
+
+            <Button
+              fullWidth
+              size='large'
+              type='submit'
+              variant='contained'
+              sx={{ marginBottom: 7, mt: 7 }}
+              onClick={handleRegisterClick}
+            >
               Sign up
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -217,31 +256,6 @@ const RegisterPage = () => {
                 </Link>
               </Typography>
             </Box>
-            <Divider sx={{ my: 5 }}>or</Divider>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Link href='/' passHref>
-                <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                  <Facebook sx={{ color: '#497ce2' }} />
-                </IconButton>
-              </Link>
-              <Link href='/' passHref>
-                <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                  <Twitter sx={{ color: '#1da1f2' }} />
-                </IconButton>
-              </Link>
-              <Link href='/' passHref>
-                <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                  <Github
-                    sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : theme.palette.grey[300]) }}
-                  />
-                </IconButton>
-              </Link>
-              <Link href='/' passHref>
-                <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
-                  <Google sx={{ color: '#db4437' }} />
-                </IconButton>
-              </Link>
-            </Box>
           </form>
         </CardContent>
       </Card>
@@ -249,5 +263,7 @@ const RegisterPage = () => {
     </Box>
   )
 }
+
+RegisterPage.getLayout = (page: React.ReactElement) => <BlankLayout> {page} </BlankLayout>
 
 export default RegisterPage

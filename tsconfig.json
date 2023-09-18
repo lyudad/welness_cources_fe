@@ -17,7 +17,6 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
     "paths": {
@@ -27,7 +26,8 @@
       "apexcharts/*": [
         "./node_modules/apexcharts-clevision/*"
       ]
-    }
+    },
+    "isolatedModules": true
   },
   "include": [
     "src"
