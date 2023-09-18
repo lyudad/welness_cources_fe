@@ -21,8 +21,12 @@ const TrophyImg = styled('img')({
   position: 'absolute'
 })
 
-const Trophy = () => {
-  // ** Hook
+interface TrophyProps {
+  groupName: string
+  amountOfUsers: number
+}
+
+const Trophy = ({ groupName, amountOfUsers }: TrophyProps) => {
   const theme = useTheme()
 
   const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
@@ -30,15 +34,12 @@ const Trophy = () => {
   return (
     <Card sx={{ position: 'relative' }}>
       <CardContent>
-        <Typography variant='h6'>Congratulations John! 🥳</Typography>
-        <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-          Best seller of the month
-        </Typography>
+        <Typography variant='h6'>{groupName}</Typography>
         <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-          $42.8k
+          {amountOfUsers} members
         </Typography>
-        <Button size='small' variant='contained'>
-          View Sales
+        <Button disabled size='small' variant='contained'>
+          View Course
         </Button>
         <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
         <TrophyImg alt='trophy' src='/images/misc/trophy.png' />

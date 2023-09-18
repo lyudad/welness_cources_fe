@@ -1,9 +1,5 @@
-// ** React Imports
 import { ReactNode, SyntheticEvent, useState } from 'react'
 
-import { useAuth0 } from '@auth0/auth0-react'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import TabList from '@mui/lab/TabList'
@@ -12,17 +8,12 @@ import TabContext from '@mui/lab/TabContext'
 import { styled } from '@mui/material/styles'
 import MuiTab, { TabProps } from '@mui/material/Tab'
 
-// ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
 
-// ** Demo Tabs Imports
-import TabInfo from '../../views/account-settings/TabInfo'
 import TabAccount from '../../views/account-settings/TabAccount'
 import TabSecurity from '../../views/account-settings/TabSecurity'
 
-// ** Third Party Styles Imports
 import 'react-datepicker/dist/react-datepicker.css'
 import UserLayout from '../../layouts/UserLayout'
 
@@ -45,7 +36,6 @@ const TabName = styled('span')(({ theme }) => ({
 }))
 
 const AccountSettings = () => {
-  // ** State
   const [value, setValue] = useState<string>('account')
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
@@ -54,8 +44,6 @@ const AccountSettings = () => {
 
   return (
     <Card>
-      <a href='/api/auth/login'>Login</a>
-
       <TabContext value={value}>
         <TabList
           onChange={handleChange}
@@ -80,15 +68,6 @@ const AccountSettings = () => {
               </Box>
             }
           />
-          <Tab
-            value='info'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          />
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>
@@ -96,9 +75,6 @@ const AccountSettings = () => {
         </TabPanel>
         <TabPanel sx={{ p: 0 }} value='security'>
           <TabSecurity />
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value='info'>
-          <TabInfo />
         </TabPanel>
       </TabContext>
     </Card>

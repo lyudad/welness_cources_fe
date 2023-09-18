@@ -46,7 +46,6 @@ const LinkStyled = styled('a')(({ theme }) => ({
 const LoginPage = () => {
   const router = useRouter()
 
-  // ** State
   const [values, setValues] = useState<State>({
     password: '',
     showPassword: false
@@ -56,13 +55,14 @@ const LoginPage = () => {
   const { onAuth } = useAuthContext()
 
   const { mutate } = useMutation(loginQuery, {
-    onSuccess: data => {
-      onAuth(data.data)
+    onSuccess: response => {
+      if (!response?.data) return
+
+      onAuth(response.data.user, response.data.token)
       router.push('/')
     }
   })
 
-  // ** Hook
   const theme = useTheme()
 
   const handleChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
