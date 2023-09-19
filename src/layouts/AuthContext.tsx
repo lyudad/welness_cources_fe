@@ -15,9 +15,17 @@ import {
 } from 'react'
 import { getUserByIdQuery } from '../api/user/getUserById'
 
+export interface IPost {
+  id: number
+  title: string
+  description: string | null
+  videoUrl: string | null
+}
+
 export interface IGroup {
   id: number
   name: string
+  description: string | null
   users:
     | {
         id: number
