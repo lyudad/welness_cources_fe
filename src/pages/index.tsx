@@ -1,101 +1,107 @@
-// ** MUI Imports
 import Grid from '@mui/material/Grid'
-import { Box } from '@mui/material'
 
-// ** Icons Imports
-import Poll from 'mdi-material-ui/Poll'
-import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
-import HelpCircleOutline from 'mdi-material-ui/HelpCircleOutline'
-import BriefcaseVariantOutline from 'mdi-material-ui/BriefcaseVariantOutline'
-
-// ** Custom Components Imports
-import CardStatisticsVerticalComponent from '../@core/components/card-statistics/card-stats-vertical'
-
-// ** Styled Component Import
 import ApexChartWrapper from '../@core/styles/libs/react-apexcharts'
 
-// ** Demo Components Imports
 import Table from '../views/dashboard/Table'
 import Trophy from '../views/dashboard/Trophy'
-import TotalEarning from '../views/dashboard/TotalEarning'
-import StatisticsCard from '../views/dashboard/StatisticsCard'
-import WeeklyOverview from '../views/dashboard/WeeklyOverview'
-import DepositWithdraw from '../views/dashboard/DepositWithdraw'
-import SalesByCountries from '../views/dashboard/SalesByCountries'
 import UserLayout from '../layouts/UserLayout'
+import { useAuthContext } from '../layouts/useAuthContext'
+import { Button, Stack, TextField, Typography } from '@mui/material'
+import { becomeTrainer } from '../api/user/becomeTrainer'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { createGroupWithTrainer } from '../api/groups/createGroupWithTrainer'
+import { FormEvent, useState } from 'react'
+import { getTrainingGroups } from '../api/groups/getTrainingGroups'
 
 const Dashboard = () => {
+  const [groupName, setGroupName] = useState<string>('')
+
+  const { user, userRoles, setUserRoles, setNewToken } = useAuthContext()
+
+  const { data: trainingGroups, refetch } = useQuery(['getTrainingGroups'], getTrainingGroups, {
+    enabled: !!userRoles?.find(({ value }) => value === 'TRAINER')
+  })
+
+  const { mutate: becomeTrainerMutation } = useMutation(becomeTrainer, {
+    onSuccess: response => {
+      if (!response?.data) return
+
+      setNewToken(response.data.token)
+
+      setUserRoles(prev => {
+        if (!prev?.length) return null
+
+        return [...prev, response.data.newRole]
+      })
+    }
+  })
+
+  const { mutate: createGroupMutation } = useMutation(createGroupWithTrainer, {
+    onSuccess: response => {
+      if (!response?.data) return
+      refetch()
+    }
+  })
+
+  const isTrainer = !!userRoles?.find(({ value }) => value === 'TRAINER')
+
+  const onBecomeTrainerClick = () => {
+    becomeTrainerMutation()
+  }
+
+  const onCreateCourseClick = (e: FormEvent) => {
+    e.preventDefault()
+
+    if (!user?.id || !groupName.trim()) return
+
+    createGroupMutation({ userId: user.id, groupName: groupName.trim() })
+  }
+
   return (
-    <ApexChartWrapper>
-      <Grid container spacing={6}>
-        <Grid item xs={12} md={4}>
-          <Trophy />
-        </Grid>
-        <Grid item xs={12} md={8}>
-          <StatisticsCard />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <WeeklyOverview />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <TotalEarning />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <Grid container spacing={6}>
-            <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
-                stats='$25.6k'
-                icon={<Poll />}
-                color='success'
-                trendNumber='+42%'
-                title='Total Profit'
-                subtitle='Weekly Profit'
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
-                stats='$78'
-                title='Refunds'
-                trend='negative'
-                color='secondary'
-                trendNumber='-15%'
-                subtitle='Past Month'
-                icon={<CurrencyUsd />}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
-                stats='862'
-                trend='negative'
-                trendNumber='-18%'
-                title='New Project'
-                subtitle='Yearly Project'
-                icon={<BriefcaseVariantOutline />}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
-                stats='15'
-                color='warning'
-                trend='negative'
-                trendNumber='-18%'
-                subtitle='Last Week'
-                title='Sales Queries'
-                icon={<HelpCircleOutline />}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <SalesByCountries />
-        </Grid>
-        <Grid item xs={12} md={12} lg={8}>
-          <DepositWithdraw />
-        </Grid>
-        <Grid item xs={12}>
-          <Table />
-        </Grid>
-      </Grid>
+    <ApexChartWrapper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {!isTrainer && (
+        <Button variant='contained' size='large' onClick={onBecomeTrainerClick}>
+          Become trainer
+        </Button>
+      )}
+
+      {isTrainer &&
+        (!!trainingGroups?.data?.length ? (
+          <Stack rowGap={10} width='100%'>
+            {trainingGroups?.data.map(group => {
+              return (
+                <Grid key={group.id} container spacing={6}>
+                  <Grid item xs={12} md={4}>
+                    <Trophy groupName={group.name} amountOfUsers={group.users?.length || 0} />
+                  </Grid>
+
+                  {!!group.users?.length ? (
+                    <Grid item xs={10}>
+                      <Table users={group.users} />
+                    </Grid>
+                  ) : (
+                    <Grid item xs={10}>
+                      <Typography>No one joined yet</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              )
+            })}
+          </Stack>
+        ) : (
+          <form style={{ display: 'flex', flexDirection: 'column', rowGap: '10px' }}>
+            <TextField label='Course name' value={groupName} onChange={e => setGroupName(e.target.value)} />
+            <Button
+              disabled={!groupName.trim()}
+              type='submit'
+              variant='contained'
+              size='large'
+              onClick={onCreateCourseClick}
+            >
+              Create your first course
+            </Button>
+          </form>
+        ))}
     </ApexChartWrapper>
   )
 }

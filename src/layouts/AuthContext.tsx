@@ -2,21 +2,50 @@ import { useMutation } from '@tanstack/react-query'
 import Cookie from 'js-cookie'
 import jwt_decode from 'jwt-decode'
 import { useRouter } from 'next/router'
-import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  Dispatch,
+  FC,
+  ReactNode,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
 import { getUserByIdQuery } from '../api/user/getUserById'
 
-interface IRole {
+export interface IGroup {
+  id: number
+  name: string
+  users:
+    | {
+        id: number
+        firstName: string | null
+        lastName: string | null
+        email: string
+        avatar: string | null
+      }[]
+    | null
+  trainer: IUser
+  trainerId: number | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface IRole {
   id: number
   value: string
 }
 
-interface IUser {
+export interface IUser {
   id: number
   firstName: string | null
   lastName: string | null
   email: string
+  avatar: string | null
   roles: IRole[]
-  group: string | null
+  group: IGroup
 }
 
 export interface AuthContextType {
@@ -25,7 +54,10 @@ export interface AuthContextType {
   accessToken: string | null
   userRoles: IRole[] | null
   user: IUser | null
-  onAuth: (data: { user: IUser; token: string }) => void
+  setUser: Dispatch<SetStateAction<IUser | null>>
+  setUserRoles: Dispatch<SetStateAction<IRole[] | null>>
+  setNewToken: (token: string) => void
+  onAuth: (user: IUser, token: string) => void
   logout: VoidFunction
 }
 
@@ -44,30 +76,42 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
 
+  const setNewToken = useCallback((token?: string) => {
+    if (token) {
+      setAccessToken(token)
+      Cookie.set('accessToken', token)
+    }
+  }, [])
+
+  const removeToken = () => {
+    setAccessToken(null)
+    Cookie.remove('accessToken')
+  }
+
   const logout = useCallback(async () => {
     setIsAuthenticated(false)
     setUserRoles(null)
     setUser(null)
 
-    Cookie.remove('accessToken')
+    removeToken()
 
     router.push('/pages/login')
   }, [router])
 
-  const onAuth = useCallback((data: { user: IUser; token: string }) => {
+  const onAuth = useCallback((user: IUser, token?: string) => {
     setIsAuthenticated(true)
-    setAccessToken(data.token)
-    setUser(data.user)
-    setUserRoles(data.roles)
+    setUser(user)
+    setUserRoles(user.roles)
 
-    if (data.token) {
-      Cookie.set('accessToken', data.token)
-    }
+    setNewToken(token)
   }, [])
 
   const { mutate } = useMutation(getUserByIdQuery, {
-    onSuccess: data => {
-      onAuth(data.data)
+    onSuccess: response => {
+      if (!response?.data) return
+
+      onAuth(response.data)
+
       router.push('/')
     },
     onError: () => {
@@ -80,8 +124,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     if (isInitialized) return
 
     const accessTokenFromCookie = Cookie.get('accessToken')
+    if (!accessTokenFromCookie) {
+      logout()
 
-    if (!accessTokenFromCookie) return setIsInitialized(true)
+      return
+    }
 
     try {
       const decodedToken: {
@@ -106,10 +153,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       accessToken,
       userRoles,
       user,
+      setUser,
+      setUserRoles,
+      setNewToken,
       onAuth,
       logout
     }),
-    [isInitialized, isAuthenticated, logout, userRoles, onAuth, user, accessToken]
+    [isInitialized, isAuthenticated, logout, userRoles, onAuth, user, setUser, setUserRoles, setNewToken, accessToken]
   )
 
   return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>
