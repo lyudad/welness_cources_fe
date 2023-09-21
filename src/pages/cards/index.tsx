@@ -7,12 +7,10 @@ import CardUser from '../../views/cards/CardUser'
 import CardImgTop from '../../views/cards/CardImgTop'
 import CardMobile from '../../views/cards/CardMobile'
 import CardSupport from '../../views/cards/CardSupport'
-import CardTwitter from '../../views/cards/CardTwitter'
 import CardFacebook from '../../views/cards/CardFacebook'
 import CardLinkedIn from '../../views/cards/CardLinkedIn'
 import CardAppleWatch from '../../views/cards/CardAppleWatch'
 import CardMembership from '../../views/cards/CardMembership'
-import CardInfluencer from '../../views/cards/CardInfluencer'
 import CardNavigation from '../../views/cards/CardNavigation'
 import CardWithCollapse from '../../views/cards/CardWithCollapse'
 import CardVerticalRatings from '../../views/cards/CardVerticalRatings'
@@ -47,9 +45,6 @@ const CardBasic = () => {
         <CardMembership />
       </Grid>
       <Grid item xs={12} sm={6} md={4}>
-        <CardInfluencer />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
         <CardVerticalRatings />
       </Grid>
       <Grid item xs={12} sm={6} md={4}>
@@ -66,9 +61,6 @@ const CardBasic = () => {
       </Grid>
       <Grid item xs={12} sx={{ pb: 4, pt: theme => `${theme.spacing(17.5)} !important` }}>
         <Typography variant='h5'>Solid Cards</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <CardTwitter />
       </Grid>
       <Grid item xs={12} sm={6} md={4}>
         <CardFacebook />

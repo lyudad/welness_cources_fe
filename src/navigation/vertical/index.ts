@@ -8,7 +8,7 @@ import { VerticalNavItemsType } from '../../@core/layouts/types'
 const navigation = (): VerticalNavItemsType => {
   return [
     {
-      title: 'Dashboard',
+      title: 'Groups',
       icon: HomeOutline,
       path: '/'
     },
@@ -17,6 +17,12 @@ const navigation = (): VerticalNavItemsType => {
       icon: AccountCogOutline,
       path: '/account-settings'
     },
+    {
+      title: 'Trainer dashboard',
+      disabled: true,
+      icon: HomeOutline,
+      path: '/training-groups'
+    }
   ]
 }
 

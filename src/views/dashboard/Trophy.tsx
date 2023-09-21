@@ -24,9 +24,10 @@ const TrophyImg = styled('img')({
 interface TrophyProps {
   groupName: string
   amountOfUsers: number
+  link?: string
 }
 
-const Trophy = ({ groupName, amountOfUsers }: TrophyProps) => {
+const Trophy = ({ groupName, amountOfUsers, link }: TrophyProps) => {
   const theme = useTheme()
 
   const imageSrc = theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
@@ -38,9 +39,11 @@ const Trophy = ({ groupName, amountOfUsers }: TrophyProps) => {
         <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
           {amountOfUsers} members
         </Typography>
-        <Button disabled size='small' variant='contained'>
-          View Course
-        </Button>
+        {!!link && (
+          <Button disabled size='small' variant='contained'>
+            View Course
+          </Button>
+        )}
         <TriangleImg alt='triangle background' src={`/images/misc/${imageSrc}`} />
         <TrophyImg alt='trophy' src='/images/misc/trophy.png' />
       </CardContent>

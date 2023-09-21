@@ -12,7 +12,6 @@ import CardContent from '@mui/material/CardContent'
 import DotsVertical from 'mdi-material-ui/DotsVertical'
 
 // ** Third Party Imports
-import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
 import ReactApexcharts from '../../@core/components/react-apexcharts'
@@ -21,7 +20,7 @@ const WeeklyOverview = () => {
   // ** Hook
   const theme = useTheme()
 
-  const options: ApexOptions = {
+  const options = {
     chart: {
       parentHeightOffset: 0,
       toolbar: { show: false }
@@ -77,8 +76,7 @@ const WeeklyOverview = () => {
       show: true,
       tickAmount: 4,
       labels: {
-        offsetX: -17,
-        formatter: value => `${value > 999 ? `${(value / 1000).toFixed(0)}` : value}k`
+        offsetX: -17
       }
     }
   }

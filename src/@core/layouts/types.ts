@@ -22,6 +22,7 @@ export type NavSectionTitle = {
   sectionTitle: string
   action?: string
   subject?: string
+  isDisabled?: boolean
 }
 
 export type VerticalNavItemsType = (NavLink | NavSectionTitle)[]

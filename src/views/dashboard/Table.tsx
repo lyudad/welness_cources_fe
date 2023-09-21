@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 
 interface DashboardTableProps {
+  isEmail?: boolean
   users:
     | null
     | {
@@ -20,17 +21,17 @@ interface DashboardTableProps {
       }[]
 }
 
-const DashboardTable = ({ users }: DashboardTableProps) => {
+const DashboardTable = ({ users, isEmail }: DashboardTableProps) => {
   return (
     <Card>
       <TableContainer>
-        <Table sx={{ minWidth: 800 }} aria-label='table in dashboard'>
+        <Table sx={{ minWidth: 200 }} aria-label='table in dashboard'>
           <TableHead>
             <TableRow>
               <TableCell width={5} />
-              <TableCell width={150}>First name</TableCell>
-              <TableCell width={150}>Last name</TableCell>
-              <TableCell sx={{ textAlign: 'right' }}>Email</TableCell>
+              <TableCell>First name</TableCell>
+              <TableCell>Last name</TableCell>
+              {isEmail && <TableCell sx={{ textAlign: 'right' }}>Email</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -39,13 +40,13 @@ const DashboardTable = ({ users }: DashboardTableProps) => {
                 <TableCell width={5}>
                   <Avatar alt='avatar' src={avatar || undefined} />
                 </TableCell>
-                <TableCell width={150}>
+                <TableCell>
                   <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{firstName}</Typography>
                 </TableCell>
-                <TableCell width={150}>
+                <TableCell>
                   <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{lastName}</Typography>
                 </TableCell>
-                <TableCell sx={{ textAlign: 'right' }}>{email}</TableCell>
+                {isEmail && <TableCell sx={{ textAlign: 'right' }}>{email}</TableCell>}
               </TableRow>
             ))}
           </TableBody>

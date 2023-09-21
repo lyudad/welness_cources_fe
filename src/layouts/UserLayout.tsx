@@ -17,7 +17,6 @@ import VerticalAppBarContent from './components/vertical/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from '../@core/hooks/useSettings'
-import { UserProvider } from '@auth0/nextjs-auth0/client'
 import { AuthGuard } from './AuthGuard'
 
 interface Props {
